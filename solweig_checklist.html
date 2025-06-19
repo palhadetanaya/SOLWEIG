@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SOLWEIG Checklist - Final Visual Verbatim</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #e8f0f8, #f4f6f9);
+      padding: 2rem;
+      margin: 0;
+      color: #2c3e50;
+    }
+    .container {
+      max-width: 960px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #1a5276;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: white;
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card summary {
+      font-size: 1.3rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #154360;
+    }
+    .card details[open] summary::after {
+      content: " ▲";
+      font-size: 0.8rem;
+    }
+    .card summary::after {
+      content: " ▼";
+      font-size: 0.8rem;
+    }
+    .card details {
+      padding-top: 1rem;
+    }
+    ul.fancy-list {
+      list-style: none;
+      padding-left: 1rem;
+    }
+    .fancy-list li {
+      margin: 0.6rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .fancy-list li::before {
+      content: "✔";
+      color: #28a745;
+      position: absolute;
+      left: 0;
+    }
+    .label {
+      background-color: #d6eaf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #1b4f72;
+    }
+    pre.verbatim {
+      white-space: pre-wrap;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📘 SOLWEIG Simulation Checklist</h1>
+
+    <div class="card">
+      <details open>
+        <summary>📂 SOLWEIG Simulation Overview</summary>
+        <ul class="fancy-list">
+          <li><span class="label">Purpose</span>: To generate and study Tmrt and understand the microclimate data using geospatial and meteorological data.</li>
+          <li><span class="label">Tools</span>: SOLWEIG (UMEP plug-in in QGIS)</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>📂 Digital Elevation Model [DEM]</summary>
+        <ul class="fancy-list">
+          <li>File type: Raster</li>
+          <li>One essential information needed is to know what pixels that are occupied with buildings.</li>
+          <li>DEM shows actual ground height (above sea level).</li>
+          <li>Goal: Download & Prepare DEM Using USGS EarthExplorer + QGIS</li>
+          <li>Website: <a href="https://earthexplorer.usgs.gov/" target="_blank">earthexplorer.usgs.gov</a></li>
+          <li>Dataset: SRTM 1 Arc-Second Global (gives 30 m resolution)</li>
+          <li>Download in geotiff format</li>
+          <li>QGIS Steps:
+            <ul class="fancy-list">
+              <li>Layer → Add Layer → Add Raster Layer</li>
+              <li>Clip DEM to AOI</li>
+              <li>Reproject to UTM zone (EPSG:32644 for Nagpur)</li>
+              <li>Fill sinks</li>
+            </ul>
+          </li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>📂 Ground + Building DSM</summary>
+        <ul class="fancy-list">
+          <li>Represents terrain + height of buildings (in masl meters above sea level)</li>
+          <li>Get DEM</li>
+          <li>Add buildings using:
+            <ul class="fancy-list">
+              <li>OpenStreetMap via QuickOSM plugin</li>
+              <li>Manual digitization using Sentinel-2 or Google Hybrid basemap</li>
+            </ul>
+          </li>
+          <li>Assign height: residential = 10m, commercial = 15–20m</li>
+          <li>Rasterize building footprint using height attribute</li>
+          <li>Combine with DEM using:
+            <ul class="fancy-list">
+              <li>Raster Calculator</li>
+              <li>OR use DSM Generator (requires polygon vector with building height)</li>
+            </ul>
+          </li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>🌳 Vegetation DSM (CDSM)</summary>
+        <ul class="fancy-list">
+          <li>The Canopy DSM (CDSM) is a raster grid that stores the height of the top of vegetation (bushes, trees) in meters above the ground level.</li>
+          <li>Create new shapefile layer: type = polygon, CRS = EPSG:32644</li>
+          <li>Add field: canopy_ht (Decimal)</li>
+          <li>Digitize tree canopies using Google Satellite or OSM basemap</li>
+          <li>Enter height values in attribute table</li>
+          <li>Rasterize using field: canopy_ht → Output: CDSM.tif</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>🌲 Tree Generator Preprocessor</summary>
+        <ul class="fancy-list">
+          <li>Create point layer (each point = one tree)</li>
+          <li>Add attributes: tree height, crown width, trunk height</li>
+          <li>Create polygon layer representing canopy outlines</li>
+          <li>Run Tree Generator using those inputs</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>🟩 Ground Cover Grid (Land Cover Raster)</summary>
+        <ul class="fancy-list">
+          <li>Digitize surface types: grass, road, soil, water, etc.</li>
+          <li>Rasterize using UMEP standard format (excluding tree classes)</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>🌦️ Meteorological Inputs</summary>
+        <ul class="fancy-list">
+          <li>Use MetPreprocessor (UMEP Plugin)</li>
+          <li>Required variables:
+            <ul class="fancy-list">
+              <li>Incoming shortwave radiation</li>
+              <li>Wind speed</li>
+              <li>Air Temperature</li>
+              <li>Relative Humidity</li>
+              <li>Barometric pressure</li>
+              <li>Rainfall</li>
+            </ul>
+          </li>
+          <li>Input can include any number of header lines</li>
+          <li>Output data is space-separated: year, day of year, hour, minute, + variables</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</body>
+</html>
